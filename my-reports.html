@@ -1,0 +1,369 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Reports | FindIt Campus</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f6f7fb;
+            color: #20243a;
+            line-height: 1.6;
+        }
+
+        header {
+            background: white;
+            padding: 18px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 12px #00000008;
+        }
+
+        header a {
+            text-decoration: none;
+            color: #635bdb;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            color: #635bdb;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #74798a;
+            margin-bottom: 25px;
+        }
+
+        .report-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .report-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid #ececf5;
+            box-shadow: 0 8px 25px #20243a08;
+            overflow-wrap: anywhere;
+        }
+
+        .report-card h2 {
+            font-size: 20px;
+            margin: 12px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 11px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #eeeaff;
+            color: #635bdb;
+        }
+
+        .badge.found {
+            background: #e4f7ed;
+            color: #167747;
+        }
+
+        .badge.recovered {
+            background: #e4f7ed;
+            color: #167747;
+        }
+
+        .detail {
+            color: #656b7c;
+            margin: 7px 0;
+            font-size: 14px;
+        }
+
+        .status {
+            font-weight: bold;
+            margin-top: 14px;
+            font-size: 14px;
+        }
+
+        .recovered-btn {
+            margin-top: 18px;
+            padding: 11px 16px;
+            background: #635bdb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .recovered-btn:hover {
+            background: #5148c5;
+        }
+
+        .recovered-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #message {
+            margin: 20px 0;
+            color: #656b7c;
+            overflow-wrap: anywhere;
+        }
+
+        .empty {
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            text-align: center;
+            color: #74798a;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 650px) {
+            .report-list {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 18px 5%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="/">🔎 FindIt Campus</a>
+        <a href="/profile.html">← My Profile</a>
+    </header>
+
+    <main class="container">
+        <a class="back-link" href="/">← Home</a>
+
+        <h1>My Reports 📋</h1>
+        <p class="subtitle">
+            View and manage the lost and found items you reported.
+        </p>
+
+        <p id="message" role="status">Loading your reports...</p>
+
+        <section id="reportList" class="report-list"></section>
+    </main>
+
+    <script>
+        const reportList = document.getElementById("reportList");
+        const message = document.getElementById("message");
+
+        function createTextElement(tag, text, className) {
+            const element = document.createElement(tag);
+            element.textContent = text;
+            if (className) element.className = className;
+            return element;
+        }
+
+        function displayReports(reports) {
+            reportList.replaceChildren();
+
+            if (!Array.isArray(reports)) {
+                message.textContent =
+                    "Unexpected reports response. Please check your API.";
+                return;
+            }
+
+            if (reports.length === 0) {
+                message.textContent = "";
+                const empty = createTextElement(
+                    "div",
+                    "You haven't created any reports yet. Start by reporting a lost or found item!",
+                    "empty"
+                );
+                reportList.appendChild(empty);
+                return;
+            }
+
+            message.textContent = `You have ${reports.length} report(s).`;
+
+            reports.forEach(item => {
+                const card = document.createElement("article");
+                card.className = "report-card";
+
+                const type = String(item.type || "Item");
+                const isLost = type.toLowerCase() === "lost";
+
+                card.appendChild(createTextElement(
+                    "span",
+                    type.toUpperCase(),
+                    "badge" + (isLost ? "" : " found")
+                ));
+
+                card.appendChild(createTextElement(
+                    "h2",
+                    item.itemName || "Unnamed Item"
+                ));
+
+                card.appendChild(createTextElement(
+                    "p",
+                    "Category: " + (item.category || "Not specified"),
+                    "detail"
+                ));
+
+                card.appendChild(createTextElement(
+                    "p",
+                    "Location: " + (item.location || "Not specified"),
+                    "detail"
+                ));
+
+                card.appendChild(createTextElement(
+                    "p",
+                    "Date: " + (item.date || "Not specified"),
+                    "detail"
+                ));
+
+                card.appendChild(createTextElement(
+                    "p",
+                    "Description: " + (item.description || "No description"),
+                    "detail"
+                ));
+
+                const recovered =
+                    item.status === "recovered" ||
+                    item.recovered === true;
+
+                card.appendChild(createTextElement(
+                    "p",
+                    recovered ? "Status: Recovered" : "Status: Active",
+                    "status"
+                ));
+
+                if (recovered) {
+                    const badge = createTextElement(
+                        "span", "Recovered", "badge recovered"
+                    );
+                    card.appendChild(badge);
+                } else {
+                    const button = createTextElement(
+                        "button",
+                        "Mark as Recovered",
+                        "recovered-btn"
+                    );
+
+                    button.type = "button";
+
+                    button.addEventListener("click", async () => {
+                        const confirmed = confirm(
+                            "Are you sure this item has been recovered?"
+                        );
+
+                        if (!confirmed) return;
+
+                        button.disabled = true;
+                        button.textContent = "Updating...";
+
+                        try {
+                            const id = item._id || item.id;
+
+                            if (!id) {
+                                throw new Error("Report ID is missing.");
+                            }
+
+                            const response = await fetch(
+                                `/api/items/${encodeURIComponent(id)}/recovered`,
+                                {
+                                    method: "PATCH",
+                                    credentials: "same-origin"
+                                }
+                            );
+
+                            const result = await response.json();
+
+                            if (!response.ok) {
+                                throw new Error(
+                                    result.message ||
+                                    result.error ||
+                                    "Could not update the report."
+                                );
+                            }
+
+                            await loadReports();
+
+                        } catch (error) {
+                            alert(error.message);
+                            button.disabled = false;
+                            button.textContent = "Mark as Recovered";
+                        }
+                    });
+
+                    card.appendChild(button);
+                }
+
+                reportList.appendChild(card);
+            });
+        }
+
+        async function loadReports() {
+            try {
+                const response = await fetch("/api/my-reports", {
+                    credentials: "same-origin"
+                });
+
+                if (response.status === 401 ||
+                    response.status === 403) {
+                    window.location.href = "/login.html";
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error("Unable to load your reports.");
+                }
+
+                const data = await response.json();
+
+                // Supports common API response formats.
+                const reports = Array.isArray(data)
+                    ? data
+                    : data.reports || data.items;
+
+                if (!Array.isArray(reports)) {
+                    throw new Error(
+                        "Unexpected API response. Check your server response."
+                    );
+                }
+
+                displayReports(reports);
+
+            } catch (error) {
+                message.textContent = error.message;
+            }
+        }
+
+        loadReports();
+    </script>
+
+</body>
+</html>

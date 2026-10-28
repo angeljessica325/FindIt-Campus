@@ -1,0 +1,400 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Browse Items | FindIt Campus</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f6f7fb;
+            color: #20243a;
+        }
+
+        header {
+            background: white;
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 12px #00000008;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: bold;
+            color: #635bdb;
+        }
+
+        header a {
+            text-decoration: none;
+            color: #635bdb;
+            font-weight: bold;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: auto;
+            padding: 45px 20px;
+        }
+
+        h1 {
+            font-size: 34px;
+            margin-bottom: 12px;
+        }
+
+        .intro {
+            color: #707588;
+            line-height: 1.7;
+            margin-bottom: 28px;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        button {
+            background: #635bdb;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 9px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #5048c5;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .filters input,
+        .filters select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #dedfeb;
+            border-radius: 10px;
+            background: white;
+            color: #20243a;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .filters input:focus,
+        .filters select:focus {
+            border-color: #635bdb;
+            box-shadow: 0 0 0 3px #635bdb18;
+        }
+
+        #status {
+            color: #635bdb;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .items {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border: 1px solid #ececf5;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px #20243a08;
+            overflow-wrap: anywhere;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px #20243a12;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 20px;
+            background: #eeecff;
+            color: #635bdb;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .tag.found {
+            background: #e5f8ed;
+            color: #16834a;
+        }
+
+        .card h3 {
+            margin: 15px 0;
+            font-size: 20px;
+        }
+
+        .card p {
+            color: #666c7d;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        .empty {
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            color: #707588;
+            line-height: 1.7;
+            grid-column: 1 / -1;
+            text-align: center;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 35px;
+            color: #635bdb;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding: 24px;
+            text-align: center;
+            background: #20243a;
+            color: white;
+        }
+
+        @media (max-width: 700px) {
+            .filters {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 18px 5%;
+            }
+
+            main {
+                padding: 35px 5%;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">🔎 FindIt Campus</div>
+        <a href="/">Home</a>
+    </header>
+
+    <main>
+
+        <div class="top">
+            <div>
+                <h1>Browse Items</h1>
+                <p class="intro">
+                    Lost something? Explore reported items
+                    and look for a possible match.
+                </p>
+            </div>
+
+            <button type="button" id="refreshBtn">
+                ↻ Refresh Items
+            </button>
+        </div>
+
+        <!-- Search and filters -->
+        <div class="filters">
+
+            <input
+                type="search"
+                id="searchInput"
+                placeholder="🔍 Search item name..."
+                aria-label="Search item name"
+            >
+
+            <select id="typeFilter" aria-label="Filter by status">
+                <option value="all">All Items</option>
+                <option value="lost">Lost Items</option>
+                <option value="found">Found Items</option>
+            </select>
+
+            <select id="categoryFilter" aria-label="Filter by category">
+                <option value="all">All Categories</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Books & Stationery">Books & Stationery</option>
+                <option value="Clothing & Accessories">Clothing & Accessories</option>
+                <option value="Keys & Cards">Keys & Cards</option>
+                <option value="Bags">Bags</option>
+                <option value="Other">Other</option>
+            </select>
+
+        </div>
+
+        <p id="status" aria-live="polite">Loading items...</p>
+
+        <div class="items" id="items"></div>
+
+        <a href="/" class="back">← Back to Home</a>
+
+    </main>
+
+    <footer>
+        © 2026 FindIt Campus | Made for our campus community 💜
+    </footer>
+
+    <script>
+        const statusText = document.getElementById("status");
+        const container = document.getElementById("items");
+
+        const searchInput = document.getElementById("searchInput");
+        const typeFilter = document.getElementById("typeFilter");
+        const categoryFilter = document.getElementById("categoryFilter");
+        const refreshBtn = document.getElementById("refreshBtn");
+
+        let allReports = [];
+
+        // Fetch reports from the backend
+        async function loadItems() {
+            statusText.textContent = "Loading items...";
+            container.replaceChildren();
+            refreshBtn.disabled = true;
+
+            try {
+                const response = await fetch("/api/items");
+
+                if (!response.ok) {
+                    throw new Error("Server error: " + response.status);
+                }
+
+                const reports = await response.json();
+
+                if (!Array.isArray(reports)) {
+                    throw new Error("Unexpected API response");
+                }
+
+                allReports = reports;
+                displayItems();
+
+            } catch (error) {
+                console.error("Items error:", error);
+                statusText.textContent =
+                    "Could not load items. Please check your server and try again.";
+            } finally {
+                refreshBtn.disabled = false;
+            }
+        }
+
+        // Search and filter reports
+        function displayItems() {
+            const searchText = searchInput.value.trim().toLowerCase();
+            const selectedType = typeFilter.value;
+            const selectedCategory = categoryFilter.value;
+
+            const filteredReports = allReports.filter(item => {
+                const name = (item.itemName || "").toLowerCase();
+
+                const matchesSearch = name.includes(searchText);
+
+                const matchesType =
+                    selectedType === "all" ||
+                    item.type === selectedType;
+
+                const matchesCategory =
+                    selectedCategory === "all" ||
+                    item.category === selectedCategory;
+
+                return matchesSearch &&
+                    matchesType &&
+                    matchesCategory;
+            });
+
+            container.replaceChildren();
+
+            statusText.textContent =
+                `Showing ${filteredReports.length} of ${allReports.length} item(s)`;
+
+            if (filteredReports.length === 0) {
+                const empty = document.createElement("div");
+                empty.className = "empty";
+
+                empty.textContent = allReports.length === 0
+                    ? "No items reported yet. Be the first to report a lost or found item!"
+                    : "No matching items found. Try changing your search or filters.";
+
+                container.appendChild(empty);
+                return;
+            }
+
+            filteredReports.forEach(item => {
+                const card = document.createElement("article");
+                card.className = "card";
+
+                const tag = document.createElement("span");
+                tag.className =
+                    item.type === "found" ? "tag found" : "tag";
+                tag.textContent = item.type || "Reported";
+
+                const title = document.createElement("h3");
+                title.textContent = item.itemName || "Unnamed item";
+
+                const category = document.createElement("p");
+                category.textContent =
+                    "Category: " + (item.category || "Other");
+
+                const location = document.createElement("p");
+                location.textContent =
+                    "Location: " + (item.location || "Not specified");
+
+                const date = document.createElement("p");
+                date.textContent =
+                    "Date: " + (item.date || "Not specified");
+
+                card.append(tag, title, category, location, date);
+                container.appendChild(card);
+            });
+        }
+
+        // Search as the user types
+        searchInput.addEventListener("input", displayItems);
+
+        // Apply selected filters
+        typeFilter.addEventListener("change", displayItems);
+        categoryFilter.addEventListener("change", displayItems);
+
+        // Reload reports from MongoDB
+        refreshBtn.addEventListener("click", loadItems);
+
+        // Initial load
+        loadItems();
+    </script>
+
+</body>
+</html>

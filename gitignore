@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Private environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Operating system files
+Thumbs.db
+.DS_Store

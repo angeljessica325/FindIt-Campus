@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report an Item | FindIt Campus</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f6f7fb;
+            color: #20243a;
+        }
+
+        header {
+            background: white;
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 12px #00000008;
+        }
+
+        .logo {
+            color: #635bdb;
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        header a {
+            color: #635bdb;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .wrapper {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 18px;
+        }
+
+        .panel {
+            background: white;
+            padding: 32px;
+            border-radius: 18px;
+            box-shadow: 0 8px 30px #20243a0c;
+        }
+
+        h1 {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .intro {
+            color: #777b8c;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin: 17px 0 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #d9dbea;
+            border-radius: 9px;
+            font: inherit;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid #a59fff;
+            border-color: #635bdb;
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: #635bdb;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: .6;
+            cursor: wait;
+        }
+
+        #message {
+            margin-top: 18px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #635bdb;
+            text-decoration: none;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #777b8c;
+            margin-top: 6px;
+        }
+
+        @media(max-width: 500px) {
+            .panel {
+                padding: 22px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">🔎 FindIt Campus</div>
+        <a href="/">Home</a>
+    </header>
+
+    <main class="wrapper">
+        <a href="/" class="back">← Back to Home</a>
+
+        <section class="panel">
+            <h1>Report an Item 📦</h1>
+
+            <p class="intro">
+                Help our campus community reunite people
+                with their belongings. Enter the item details below.
+            </p>
+
+            <form id="reportForm">
+
+                <label for="type">Report Type *</label>
+                <select id="type" name="type" required>
+                    <option value="lost">I lost an item</option>
+                    <option value="found">I found an item</option>
+                </select>
+
+                <label for="itemName">Item Name *</label>
+                <input
+                    id="itemName"
+                    name="itemName"
+                    maxlength="80"
+                    minlength="2"
+                    placeholder="e.g. Blue water bottle"
+                    required
+                >
+
+                <label for="category">Category *</label>
+                <select id="category" name="category" required>
+                    <option value="">Select category</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Books & Stationery">Books & Stationery</option>
+                    <option value="Clothing & Accessories">Clothing & Accessories</option>
+                    <option value="Keys & Cards">Keys & Cards</option>
+                    <option value="Bags">Bags</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <label for="location">Location *</label>
+                <input
+                    id="location"
+                    name="location"
+                    minlength="2"
+                    maxlength="120"
+                    placeholder="e.g. Library"
+                    required
+                >
+
+                <label for="date">Date *</label>
+                <input id="date" name="date" type="date" required>
+                <p class="hint">Choose today or an earlier date.</p>
+
+                <label for="description">Description *</label>
+                <textarea
+                    id="description"
+                    name="description"
+                    minlength="5"
+                    maxlength="500"
+                    placeholder="Describe the item. Avoid sensitive details."
+                    required
+                ></textarea>
+
+                <button id="submitBtn" type="submit">
+                    Submit Report
+                </button>
+
+                <p id="message" role="status" aria-live="polite"></p>
+
+            </form>
+        </section>
+    </main>
+
+    <script>
+        const typeSelect = document.getElementById("type");
+        const dateInput = document.getElementById("date");
+
+        // Prevent selecting a future date
+        const today = new Date();
+        const localToday = [
+            today.getFullYear(),
+            String(today.getMonth() + 1).padStart(2, "0"),
+            String(today.getDate()).padStart(2, "0")
+        ].join("-");
+
+        dateInput.max = localToday;
+
+        // Read report type from the homepage link
+        const params = new URLSearchParams(window.location.search);
+        const requestedType = params.get("type");
+
+        if (requestedType === "lost" || requestedType === "found") {
+            typeSelect.value = requestedType;
+        }
+    </script>
+
+    <script src="/report.js"></script>
+
+</body>
+</html>
